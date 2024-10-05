@@ -2,7 +2,7 @@ import React, {useState, useContext, useRef, useSyncExternalStore} from "react";
 import styled from "styled-components";
 import axios from 'axios';
 
-import { Stock_full_data, full_data } from "./Apps/Data/stock_data.js";
+import { Stock_full_data, full_data, new_data } from "./Apps/Data/stock_data.js";
 
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -35,7 +35,7 @@ function main_page_return(page_name)
 
 function Main_layout()
 {
-    const cot_full_data = useRef(full_data);
+    const cot_full_data = useRef(new_data());
     const [d_open, set_d_open] = useState(false);
     const [drawer_page, set_drawer_page] = useState(page_names[0]);
 
@@ -83,34 +83,31 @@ function Main_layout()
 function Head_post()
 {
     const cont_stock_full_data = useContext(Stock_full_data);
-    function save_click ()
-    {
-        //console.log(cont_stock_full_data.current);
-        //
-        axios.post("http://localhost:8000/get", 
-            {data: JSON.stringify(cont_stock_full_data.current)}
-        )
-            .then((res) => {
-                console.log("post!");
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        
-    }
-    function load_click()
-    {
-        axios.get("http://localhost:8000/test")
-            .then((response) => {
-                console.log("GEt!");
-                const get_data = JSON.parse(response.data);
-                //console.log(JSON.parse(response.data));
-                cont_stock_full_data.current = get_data;
-            })
-            .catch((error) => {
-                console.log(error);
-            })
 
+    async function save_click ()
+    {
+        console.log("save_date", cont_stock_full_data.current.date);
+        const data = await axios.post("http://localhost:8000/data/save", 
+            {data: JSON.stringify(cont_stock_full_data.current)});
+        console.log("save");
+    }
+
+    async function load_click()
+    {
+
+        console.log("load_date", cont_stock_full_data.current.date);
+        const data = await axios.get("http://localhost:8000/data/load", { params: {date: cont_stock_full_data.current.date}});
+        const data_json = JSON.parse(data.data);
+        if (data_json.date == "new")
+        {
+            console.log("new");
+            cont_stock_full_data.current = new_data(cont_stock_full_data.current.date);
+        }
+        else
+        {
+            console.log(data_json);
+            cont_stock_full_data.current = data_json;
+        }
     }
 
     return (

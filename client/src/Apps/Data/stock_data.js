@@ -1,4 +1,5 @@
 import { createContext, useRef, useContext } from 'react';
+import dayjs from 'dayjs';
 
 function make_stock_data(
     name, id, money, wantper, parent_id, item
@@ -9,7 +10,7 @@ function make_stock_data(
 
 export const full_data = {
     id: "",
-    date: "",
+    date: dayjs().format("YY-MM-DD"),
     item: [
     make_stock_data("한국", crypto.randomUUID(), 0, 30, "", [
         make_stock_data("한국은행주", crypto.randomUUID(), 0, 30, "", [
@@ -32,6 +33,22 @@ export const full_data = {
         ])
     ]),
 ]}
+
+
+
+export function new_data(today = dayjs().format("YY-MM-DD"))
+{
+    const self_id = crypto.randomUUID();
+    const obj = {
+        id: self_id,
+        date: today,
+        item: [
+        make_stock_data("한국", crypto.randomUUID(), 0, 0, self_id, []),
+        make_stock_data("미국", crypto.randomUUID(), 0, 0, self_id, [])
+        ]
+    }
+    return obj
+}
 
 export const Stock_full_data = createContext();
 
