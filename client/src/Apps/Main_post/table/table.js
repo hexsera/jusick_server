@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useRef, useContext } from 'react';
 import { styled } from '@mui/material/styles';
 
-import { Stock_full_data, save_data } from '../../Data/stock_data';
+import { Stock_full_data, Stock_full_data_opt, save_data } from '../../Data/stock_data';
 
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -25,6 +25,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveIcon from '@mui/icons-material/Remove';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 
 
@@ -121,48 +122,58 @@ const test_data = [
 ]
 
 function Tables() {
-    const full_table_data = useRef(useContext(Stock_full_data).current.item);
+    //const stock_f_data = useContext(Stock_full_data_opt).ref.current.item;
+    const full_table_data = useContext(Stock_full_data_opt).ref.current.item;
+    //const full_table_data = useContext(Stock_full_data_opt).ref
     //const full_table_data = useRef(test_data);
     const [tab_value, set_tab_value] = useState(0);
 
-    const [frame_list, set_frame_list] = useState(full_table_data.current[tab_value].item);
+    const [frame_list, set_frame_list] = useState(full_table_data[tab_value].item);
     const [delete_on, set_delete_on] = useState(false);
 
     function new_frame() {
-        full_table_data.current[tab_value].item = [...full_table_data.current[tab_value].item, make_stock_data("", crypto.randomUUID(), 0, 0, full_table_data.current[tab_value].id, [])];
+        full_table_data[tab_value].item = [...full_table_data[tab_value].item, make_stock_data("", crypto.randomUUID(), 0, 0, full_table_data[tab_value].id, [])];
 
-        set_frame_list([...full_table_data.current[tab_value].item]);
+        set_frame_list([...full_table_data[tab_value].item]);
 
     }
 
     function delete_frame(idx) {
-        full_table_data.current[tab_value].item.splice(idx, 1);
-        set_frame_list([...full_table_data.current[tab_value].item]);
+        full_table_data[tab_value].item.splice(idx, 1);
+        set_frame_list([...full_table_data[tab_value].item]);
     }
 
     function tab_change(e, value) {
         set_tab_value(value);
-        set_frame_list([...full_table_data.current[value].item]);
+        set_frame_list([...full_table_data[value].item]);
     }
 
+    function frame_sum()
+    {
+        let full_money = 0;
+        for (const i of full_table_data[tab_value].item)
+        {
+            full_money = full_money + i.money;
+        }
+        full_table_data[tab_value].money = full_money;
+    }
 
     return (
         <Box sx={{display:"flex", height: "100%", flexDirection: "column"}}>
             <Box sx={{display: 'flex', borderBottom: 1, borderColor: 'divider'}}>
                 <Tabs value={tab_value} onChange={tab_change}>
-                    {full_table_data.current.map((element, index)=> (
+                    {full_table_data.map((element, index)=> (
                         <Tab key={element.id} label={element.name} value={index}/>
                     ))}
                 </Tabs>
-
             </Box>
-            <Box sx={{}}>
+            <Box>
                 <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell sx={{width: "5%"}}>
                             <Button onClick={()=>{
-                                console.log(full_table_data.current)
+                                console.log(full_table_data)
                             }}>console
                             </Button>
                         </TableCell>
@@ -197,7 +208,8 @@ function Tables() {
                     {
                         frame_list.map((element, index) => (
                             <Stock_frame_Table key={element.id} 
-                                stock_frame={full_table_data.current[tab_value].item[index]} delete_on={delete_on} idx={index} del_f={delete_frame}/>
+                                stock_frame={full_table_data[tab_value].item[index]} delete_on={delete_on} idx={index} 
+                                del_f={delete_frame} frame_sum_func={frame_sum}/>
                         ))
                     }
                     
@@ -253,6 +265,7 @@ function Stock_frame_Table(props) {
         }
         set_sum_money(full_money);
         props.stock_frame.money = full_money;
+        props.frame_sum_func();
     }
 
     function name_change(e)

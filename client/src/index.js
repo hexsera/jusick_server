@@ -1,17 +1,39 @@
-import React from 'react';
+import React, {useState, useRef} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 import Main_layout from './main_page.js'
+import Login_page from './Apps/Login/login_page.js'
 
 import Tables from './Apps/Main_post/table/table.js'
 import Test_one from './Apps/Main_post/test.js'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+function Main_page_view()
+{
+  const [login, set_login] = useState(false);
+  const user_id = useRef();
+
+  if (login == false)
+  {
+    return (
+      <Login_page set_login={set_login} login_id={user_id}/>
+    )
+  }
+  else
+  {
+    return (
+      <Main_layout login_id={user_id.current}/>
+    )
+  }
+
+}
+
 root.render(
   <React.StrictMode>
-    <Main_layout />
+    <Main_page_view/>
     
   </React.StrictMode>
 );
